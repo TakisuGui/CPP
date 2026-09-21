@@ -1,3 +1,7 @@
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
+
+
 #include<bits/stdc++.h>
 #include "1_List.h" 
 using namespace std;
@@ -24,11 +28,10 @@ public:
     T getelem(int i);
     int locateelem(T e);
     int Length();
-    virtual bool Insert(int i,T e);
-    virtual bool Delete(int i,T& e);
-    virtual bool Pushback(T e);
+    virtual Status Insert(int i,T e);
+    virtual Status Delete(int i,T& e);
+    virtual Status Insert(T e);
 
-    virtual void Outputlist();
     bool Inputlist();
     bool Inputlist_R();
     bool Reverse();
@@ -41,7 +44,6 @@ template<class T>
 linkedlist<T>:: linkedlist()
 {
     head=new Node<T>;
-    head->data=0;
     head->next=nullptr;
 }
 
@@ -78,7 +80,7 @@ T linkedlist<T>:: getelem(int i)
 
 // 3. 插入元素
 template<class T>
-bool linkedlist<T>:: Insert(int i, T e)
+Status linkedlist<T>:: Insert(int i, T e)
 {
     Node<T>* p; Node<T>* s;
     p=head;
@@ -99,7 +101,7 @@ bool linkedlist<T>:: Insert(int i, T e)
 
 // 4. 删除元素
 template<class T>
-bool linkedlist<T>:: Delete(int i, T& e)
+Status linkedlist<T>:: Delete(int i, T& e)
 {
     Node<T>* p; Node<T>* q;
     p=head;
@@ -123,7 +125,7 @@ template<class T>
 bool linkedlist<T>:: Inputlist_R()
 {
     Node<T>* p;
-    int n; cin>>m;
+    int n; cin>>n;
     for(int i=0;i<n;i++)
     {
         p=new Node<T>;
@@ -159,7 +161,7 @@ template<class T>
 void linkedlist<T>:: Union(linkedlist<T>& lb)
 {
     int lb_len=lb.Length();
-    int e;
+    T e;
 
     for(int i=1;i<=lb_len;i++)
     {
@@ -231,3 +233,20 @@ bool linkedlist<T>:: isempty()
     if(head->next) return false;
     else return true;
 }
+
+
+// 11. 尾插
+template<class T>
+Status linkedlist<T>::Insert(T e)
+{
+    Node<T>* last=head;
+    while (last->next) last=last->next;
+    Node<T>* s=new Node<T>();
+    s->data=e;
+    s->next=nullptr;
+    last->next=s;
+    return OK;
+}
+
+
+#endif

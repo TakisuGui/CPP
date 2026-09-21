@@ -1,3 +1,7 @@
+#ifndef SQLIST_H
+#define SQLIST_H
+
+
 #include<bits/stdc++.h>
 #include "1_List.h" 
 using namespace std;
@@ -210,3 +214,5 @@ void Sqlist<T>:: Outputlist()
     for (i=0;i<length;i++)  cout<<elem[i]<<"->";
     cout<<endl;
 }
+
+#endif
