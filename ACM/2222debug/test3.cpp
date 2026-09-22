@@ -1,38 +1,114 @@
-#include <iostream>
+#include<bits/stdc++.h>
 using namespace std;
+typedef int Status;
+#define OK 1
+#define ERROR 0
 
-// 逻辑运算函数
-bool NOT(bool x) { return !x; }
-bool AND(bool x, bool y) { return x && y; }
-bool OR(bool x, bool y) { return x || y; }
-bool IMPLY(bool x, bool y) { return !x || y; }
-bool EQUIV(bool x, bool y) { return x == y; }
+template<class T>
+class Node
+{
+public:
+    T data;
+    Node<T>* next;
+};
 
-int main() {
-    int p, q;
+
+template<class T>
+class List
+{
+public:
+    virtual Status Insert(T e)=0;
+    virtual void Delete(Node<T>* i)=0;
+};
+
+
+template<class T>
+class linkedlist: public List<T>
+{
+public:
+    Node<T>* head;
+public:
+    linkedlist();
+    ~linkedlist();
     
-    cout << "========== 逻辑联结词真值计算器 ==========" << endl;
-    cout << "请输入命题P的真值(0=假,1=真):";
-    cin >> p;
-    cout << "请输入命题Q的真值(0=假,1=真):";
-    cin >> q;
+    virtual Status Insert(T e);
+    virtual void Delete(Node<T>* i);
+};
+
+template<class T>
+linkedlist<T>:: linkedlist()
+{
+    head=new Node<T>;
+    head->next=nullptr;
+}
+
+template<class T>
+linkedlist<T>:: ~linkedlist()
+{
+    Node<T>* p;
+    while(head!=nullptr)
+    {
+        p=head;
+        head=head->next;
+        delete p;
+    }
+}
+
+
+template<class T>
+Status linkedlist<T>::Insert(T e)
+{
+    Node<T>* last=head;
+    while (last->next) last=last->next;
+    Node<T>* s=new Node<T>();
+    s->data=e;
+    s->next=nullptr;
+    last->next=s;
+    return OK;
+}
+
+template<class T>
+void linkedlist<T>:: Delete(Node<T>* i)
+{
+    Node<T>* p,* q;
+    p=head;
+    while(p&&p->next!=i)
+    {
+        p=p->next;
+    }
+    if(p==nullptr) return;
+
+    q=p->next;
+    p->next=q->next;
+    delete q;
+}
+
+
+int main()
+{
+    int n; cin>>n;
+    linkedlist<int> lis;
+    for(int i=1;i<=n;i++) 
+    {
+        int x; cin>>x;
+        lis.Insert(x);
+    }
     
-    // 转换为布尔值
-    bool P = (p == 1);
-    bool Q = (q == 1);
+    Node<int>* p=lis.head->next;
+    int k; cin>>k;
+    while(p)
+    {
+        Node<int>* nex=p->next;
+        if(p->data==k) lis.Delete(p);
+        p=nex;
+    }
     
-    cout << "\n========== 计算结果 ==========" << endl;
-    cout << "P = " << p << ", Q = " << q << "\n" << endl;
-    cout << "┌─────────────┬──────────┬─────┐" << endl;
-    cout << "│ 联结词      │ 表达式   │ 结果│" << endl;
-    cout << "├─────────────┼──────────┼─────┤" << endl;
-    cout << "│ 否定        │ ~P       │  " << NOT(P) << "  │" << endl;
-    cout << "│ 否定        │ ~Q       │  " << NOT(Q) << "  │" << endl;
-    cout << "│ 合取        │ P ∧ Q    │  " << AND(P, Q) << "  │" << endl;
-    cout << "│ 析取        │ P ∨ Q    │  " << OR(P, Q) << "  │" << endl;
-    cout << "│ 蕴含        │ P → Q    │  " << IMPLY(P, Q) << "  │" << endl;
-    cout << "│ 等价        │ P ? Q    │  " << EQUIV(P, Q) << "  │" << endl;
-    cout << "└─────────────┴──────────┴─────┘" << endl;
-    
-    return 0;
+
+    p=lis.head->next;
+    while(p)
+    {
+        cout<<p->data<<" ";
+        p=p->next;
+    }
+    cout<<endl;
 }
