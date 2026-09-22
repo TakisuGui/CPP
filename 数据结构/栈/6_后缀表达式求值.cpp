@@ -3,11 +3,12 @@
 using namespace std;
 #define endl "\n"
 
+
 int priority(char op)
 {
     if(op=='+'||op =='-') return 1;
     if(op=='*'||op =='/') return 2;
-    if(op=='~') return 3;   // 一元负号，最高
+    if(op=='~') return 3;
     return 0; // '(' 视为 0，不入此判断
 }
 
@@ -23,7 +24,6 @@ int calc(int a,int b,char op)
     return 0;
 }
 
-// 判断某个位置是否是一元负号
 bool isUnaryMinus(const string& s,int i)
 {
     if(s[i]!='-') return false;
@@ -32,69 +32,43 @@ bool isUnaryMinus(const string& s,int i)
     return prev=='(' || prev=='+' || prev =='-'|| prev =='*' || prev=='/';
 }
 
-void applyTop(SqStack<int>& nums,SqStack<char>& ops)
-{
-    char op=ops.Top(); ops.Pop();
-    if(op=='~')
-    {
-        int a=nums.Top(); nums.Pop();
-        nums.Push(-a);
-    }
-    else
-    {
-        int b=nums.Top(); nums.Pop();
-        int a=nums.Top(); nums.Pop();
-        nums.Push(calc(a,b,op));
-    }
-}
 
-int eva(const string& s)
+string infixToPostfix(const string& s)
 {
-    SqStack<int> nums; SqStack<char>ops;
+    SqStack<char> ops;
+    string ans;
     for(int i=0;i<s.size();i++)
     {
         char c=s[i];
-        if(isdigit(c)) 
+        if(isdigit(c))
         {
-            int val=0;
-            while(i<s.size()&&isdigit(s[i]))
+            while(i<s.size() && isdigit(s[i]))
             {
-                val=val*10+s[i]-'0';
-                i++;
+                ans+=s[i++];
             }
             i--;
-            nums.Push(val);
+            ans+=' ';
         }
-        else if(c=='(') ops.Push(c);
         else if(isUnaryMinus(s,i))
         {
-            if(i+1<s.size() && s[i+1]=='(')  ops.Push('~');
-            else
-            {
-                i++;
-                int val=0;
-                while(i<s.size()&&isdigit(s[i]))
-                {
-                    val=val*10+s[i]-'0';
-                    i++;
-                }
-                i--;
-                nums.Push(-val);
-            }
+            ops.Push('~');
         }
+        else if(c=='(') ops.Push(c);
         else if(c==')')
         {
             while(ops.Top()!='(')
             {
-                applyTop(nums, ops);
+                ans+=ops.Top(); ans+=' ';
+                ops.Pop(); 
             }
-            ops.Pop(); // 弹出 '('
+            ops.Pop();
         }
         else
         {
             while(!ops.isempty() && ops.Top()!='(' && priority(ops.Top())>=priority(c))
             {
-                applyTop(nums, ops);
+                ans+=ops.Top(); ans+=' ';
+                ops.Pop();
             }
             ops.Push(c);
         }
@@ -102,7 +76,32 @@ int eva(const string& s)
 
     while(!ops.isempty())
     {
-       applyTop(nums, ops);
+       ans+=ops.Top(); ans+=' ';
+        ops.Pop();
+    }
+    return ans;
+}
+
+
+int eva(const string& s)
+{
+    SqStack<int> nums;
+    stringstream ss(s);
+    string token;
+    while(ss>>token)
+    {
+        if(token == "~")
+        {
+            int a=nums.Top(); nums.Pop();
+            nums.Push(-a);
+        }
+        else if(token.size()==1 && string("+-*/").find(token[0])!=string::npos) // 是否为运算符
+        {
+            int b=nums.Top(); nums.Pop();
+            int a=nums.Top(); nums.Pop();
+            nums.Push(calc(a,b,token[0]));
+        }
+        else nums.Push(stoi(token));
     }
     return nums.Top();
 }
@@ -110,10 +109,10 @@ int eva(const string& s)
 void solve()
 {
     string s; cin>>s;
-    cout<<eva(s)<<endl;
+    cout<<eva(infixToPostfix(s))<<endl;
 }
 
-signed main()
+int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(0);
